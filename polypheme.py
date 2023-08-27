@@ -29,21 +29,15 @@ import time as t
 import openpyxl.utils.exceptions
 
 
-# C:\Users\eytan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\Scripts\pyinstaller polypheme.spec
-
-
 class MovableImage(tk.Frame):
     def __init__(self, parent, nom):
         tk.Frame.__init__(self, parent)
         self.parent = parent
 
-        # dictionary for storing information about movement
         self.start_coords = {"x": 0, "y": 0, "move": False}
 
-        # dictionary for storing information about movement
         self.start_coords_main = {"x": 0, "y": 0, "move": False}
 
-        # loads the image
         self.image = Image.open(nom)
 
         img = self.image
@@ -51,8 +45,6 @@ class MovableImage(tk.Frame):
         im_output = enhancer.enhance(1)
         self.image2 = im_output
         self.image2.putalpha(250)
-        # sets the images to their corresponding variables so that they can be referenced later
-        # resizes the smaller image to fit the navigation window
         self.main_image = ImageTk.PhotoImage(
             self.image.resize((1000, 1000), Image.ANTIALIAS)
         )
@@ -63,15 +55,12 @@ class MovableImage(tk.Frame):
             self.image.resize((200, 200), Image.ANTIALIAS)
         )
 
-        # creates the canvas to store the bigger image on
         self.main_canvas = tk.Canvas(self, width=200, height=200, highlightthickness=0)
         self.main_canvas.pack()
-        # puts image on canvas
         self.main_image_id = self.main_canvas.create_image(
             (0, 0), image=self.tempon_image, anchor="nw", tags="main_image"
         )
 
-        # creates the smaller canvas that will be used for navigation
         self.nav_canvas = tk.Canvas(
             self.main_canvas,
             width=50,
@@ -79,26 +68,23 @@ class MovableImage(tk.Frame):
             highlightthickness=1,
             highlightbackground="grey",
         )
-        # adds the smaller canvas as a window to the main_canvas
         self.main_canvas.create_window(
             (150, 150), window=self.nav_canvas, anchor="nw", tags="nav_canvas"
         )
-        # adds the resized image to nav_canvas
         self.nav_canvas.create_image((0, 0), image=self.nav_image, anchor="nw")
-        # binds functions
+
         self.nav_canvas.bind("<Button-1>", self.set_start_coords)
         self.nav_canvas.bind("<B1-Motion>", self.move_coords)
 
         self.nav_canvas.bind("<ButtonRelease-1>", self.fini_coords)
 
     def fini_coords(self, event):
-        # creates a rectangle to indicate the current view of the image
+        
         self.nav_canvas.delete(self.nav_box)
         self.main_canvas.itemconfig(self.main_image_id, image=self.tempon_image)
         self.main_canvas.coords(self.main_image_id, 0, 0)
 
-    # function that sets the starting coords so that they can be referenced later, also sets whether the box can be moved at all
-    def set_start_coords(self, event):
+     def set_start_coords(self, event):
         x = event.x - 5
         y = event.y - 5
 
@@ -113,7 +99,7 @@ class MovableImage(tk.Frame):
 
         self.main_canvas.itemconfig(self.main_image_id, image=self.main_image)
 
-        # creates a rectangle to indicate the current view of the image
+        
         self.nav_box = self.nav_canvas.create_rectangle(
             (x, y, x + 10, y + 10), outline="black"
         )
@@ -127,8 +113,6 @@ class MovableImage(tk.Frame):
         else:
             self.start_coords["move"] = False
 
-    # the moving part, this takes reference from the starting coords and uses them for calculation
-    # basic border checks and then the actual moving
     def move_coords(self, event):
         if not self.start_coords["move"]:
             return
